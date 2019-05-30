@@ -1,0 +1,39 @@
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender" level="trace">
+    <encoder>
+      <pattern>%d{ISO8601} - %X{methodName} - %msg%n%xThrowable{full}
+      </pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator>
+      <Key>methodName</Key>
+        <DefaultValue>notTestClass</DefaultValue>
+    </discriminator>
+    <sift>
+      <appender name="FILE-${methodName}"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+          <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logs/%d/${methodName}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+          </rollingPolicy>
+          <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{ISO8601} %-5level %C{1} [%M:%L] [%thread] - %msg%n%ex{full} </Pattern>
+          </layout>
+       </appender>
+    </sift>
+  </appender>
+
+  <root level="trace">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE-THREAD" />
+  </root>
+
+  <logger name="org.hibernate" level="info">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE-THREAD" />
+  </logger>
+
+</configuration>
